@@ -1,10 +1,12 @@
 package com.example.rsshool2021_android_task_pomodoro
 
+import android.os.Build
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -21,10 +23,12 @@ class TimerAdapter(val listeners: TimerListeners): ListAdapter<MyTimer,TimerHold
             return TimerHolder(binding, listeners)
         }
 
+        @RequiresApi(Build.VERSION_CODES.KITKAT)
         override fun onBindViewHolder(holder: TimerHolder, position: Int) {
             holder.bind(getItem(position))
             //   notifyDataSetChanged()
             Log.d("MyLog","onBindViewHolder")
+
             }
 
      //   override fun getItemCount(): Int {

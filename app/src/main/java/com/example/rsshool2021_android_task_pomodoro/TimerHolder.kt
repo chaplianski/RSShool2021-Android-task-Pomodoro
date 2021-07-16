@@ -1,12 +1,22 @@
 package com.example.rsshool2021_android_task_pomodoro
 
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
+import android.app.Application
+import android.content.Context
+import android.content.ContextWrapper
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.drawable.AnimationDrawable
-import android.media.AudioManager
-import android.media.ToneGenerator
+import android.media.*
 import android.os.Build
 import android.os.CountDownTimer
+import android.util.AttributeSet
 import android.util.Log
+import android.view.Gravity.FILL
+import android.view.View
+import androidx.annotation.AttrRes
 import androidx.annotation.RequiresApi
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
@@ -17,9 +27,7 @@ import kotlin.properties.Delegates
 class TimerHolder (
     private val binding: TimerItemBinding,
     val listeners: TimerListeners
-
-
-): RecyclerView.ViewHolder(binding.root){
+): RecyclerView.ViewHolder(binding.root) {
 
     private var timer: CountDownTimer? = null
 
@@ -30,6 +38,7 @@ class TimerHolder (
             startTimer(myTimer)
         }else {
                  stopTimer(myTimer)
+
              }
 
         Log.d("MyLog","fun bind")
@@ -38,10 +47,9 @@ class TimerHolder (
 
     private fun initButtonsListeners(myTimer: MyTimer) {
         binding.btControl.setOnClickListener {
-            //for (n in 0..myTimers.size-1){
+
                 Log.d("MyLog","Таймер номер ${myTimers.size}")
-        //        listeners.stop(n, myTimer.currentMs)
-        //    }
+
             if (myTimer.isStarted) {
                 listeners.stop(myTimer.id, myTimer.currentMs)
                 Log.d("MyLog","Pause")
@@ -49,12 +57,11 @@ class TimerHolder (
 
                 Log.d("MyLog","Timer Id = ${myTimer.id}")
                 listeners.start(myTimer.id)
+
                 Log.d("MyLog","Start")
-
             }
-        }
 
-      //  binding.restartButton.setOnClickListener { listener.reset(myTimer.id) }
+        }
 
         binding.deleteBt.setOnClickListener {
             listeners.delete(myTimer.id)
@@ -65,6 +72,7 @@ class TimerHolder (
 
     private fun startTimer(myTimer: MyTimer) {
         binding.btControl.text = "PAUSE"
+    //    R.string.Pause
 
         timer?.cancel()
         timer = getCountDownTimer(myTimer)
@@ -74,22 +82,22 @@ class TimerHolder (
         binding.indicator.isInvisible = false
         (binding.indicator.background as? AnimationDrawable)?.start()
 
-        binding.circularProgressbar.progress = 0 // Main Progress
-        binding.circularProgressbar.secondaryProgress = 100 // Secondary Progress
-        binding.circularProgressbar.max = 100 // Maximum Progress
-       // binding.circularProgressbar.progressDrawable = drawable
 
-        val m = 100- myTimer.currentMs.toInt()*100/60000
-        animation = ObjectAnimator.ofInt (binding.circularProgressbar, "progress",m,100)
 
-        Log.d("MyLog", (100-((myTimer.currentMs*100)/60000)).toString())
+        binding.circularProgressbarOne.setPeriod(myTimer.allMs)
+        binding.circularProgressbarTwo.setPeriod(myTimer.allMs)
 
-        animation.setDuration(myTimer.currentMs.toString().toLong())
-    //    Log.d("MyLog",myTimer.currentMs.toString())
-        //   animation.setInterpolator(TimeInterpolator 100)
-        animation.start()
+        binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
+        binding.circularProgressbarTwo.setCurrent(myTimer.currentMs)
+
+
+
+
+        Log.d("MyLog", "осталось ${myTimer.currentMs}")
+
 
     }
+
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun stopTimer(myTimer: MyTimer) {
@@ -97,16 +105,19 @@ class TimerHolder (
         binding.btControl.text = "START"
         timer?.cancel()
 
+
         binding.indicator.isInvisible = true
         (binding.indicator.background as? AnimationDrawable)?.stop()
 
-        binding.circularProgressbar.progress = 50
+      //  binding.circularProgressbarTwo.progress = 100- myTimer.currentMs.toInt()*100/myTimer.allMs.toInt()
 
-            //myTimer.currentMs.toString().toInt() // Main Progress
+       //     myTimer.currentMs.toString().toInt() // Main Progress
      //   binding.circularProgressbar.secondaryProgress = 100 // Secondary Progress
      //   binding.circularProgressbar.max = 100 // Maximum Progress
      //   binding.circularProgressbar.progressDrawable = drawable
 
+        binding.circularProgressbarOne.setPeriod(myTimer.allMs)
+        binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
 
         //val animation = ObjectAnimator.ofInt (binding.circularProgressbar, "progress", 0, 100)
         //animation.setDuration(1000)
@@ -118,33 +129,46 @@ class TimerHolder (
 
     private fun getCountDownTimer(myTimer: MyTimer): CountDownTimer {
 
-       // return object : CountDownTimer(PERIOD, UNIT_TEN_MS) {
-        return object : CountDownTimer(myTimer.currentMs.toString().toLong(), 1000) {
+       return object : CountDownTimer(myTimer.currentMs.toString().toLong(), 1000) {
        // val interval = UNIT_TEN_MS
           //  var timerTime = myTimer.currentMs.toString().toLong()
             override fun onTick(timerTime: Long) {
-           // override fun onTick(millisUntilFinished: Long) {
 
+                    myTimer.currentMs = timerTime
 
-               //     myTimer.currentMs = timerTime
-                 //   myTimer.currentMs -= interval
-                    //   myTimer.currentMs += interval
                     Log.d("MyLog","Tick ${myTimer.currentMs.toString()}")
-
-           binding.timeView.text = timerTime.displayTime()}
-         //  binding.timeView.text = myTimer.currentMs.displayTime()}
-                //binding.timeView.text = myTimer.currentMs.displayTime()
-
+                    binding.timeView.text = timerTime.displayTime()
+                    binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
+                    binding.circularProgressbarTwo.setCurrent(myTimer.currentMs)
 
 
-            override fun onFinish() {
-                binding.timeView.text = "00:00:00"
-                binding.indicator.isInvisible = true
-             //   val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-             //   toneGen1.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT,15000)
+
+
+           if(myTimer.currentMs < 2000L ) {
+                //        val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+                //        toneGen1.startTone(ToneGenerator.TONE_CDMA_CALL_SIGNAL_ISDN_NORMAL, 5000)
+                    }
+
             }
-        }
-    }
+
+           override fun onFinish() {
+               binding.indicator.isInvisible = true
+               myTimer.currentMs = 0L
+               binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
+               binding.circularProgressbarTwo.setCurrent(myTimer.currentMs)
+
+               binding.timeView.text = myTimer.currentMs.displayTime()
+               Log.d("MyLog","End time ${myTimer.currentMs.toString()}")
+
+               val beeper = MediaPlayer.create(itemView.context, R.raw.beep)
+               beeper.start()
+           }
+
+       }
+
+       }
+
+
 
 
     private fun Long.displayTime(): String {
@@ -162,9 +186,10 @@ class TimerHolder (
         else "0$count"
     }
 
-    companion object {
+
+  //  companion object {
     //    const val START_TIME = "00:00:00:01"
      //   private const val UNIT_TEN_MS = 10L
-        private const val UNIT_TEN_MS = 1000L
-    }
+   //     private const val UNIT_TEN_MS = 1000L
+  //  }
 }

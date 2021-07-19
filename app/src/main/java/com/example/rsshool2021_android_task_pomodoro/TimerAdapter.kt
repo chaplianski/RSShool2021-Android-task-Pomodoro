@@ -21,6 +21,7 @@ class TimerAdapter(val listeners: TimerListeners): ListAdapter<MyTimer,TimerHold
             Log.d("MyLog","onCreateViewHolder")
             val binding = TimerItemBinding.inflate(layoutInflater, parent, false)
             return TimerHolder(binding, listeners)
+
         }
 
         @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -28,20 +29,11 @@ class TimerAdapter(val listeners: TimerListeners): ListAdapter<MyTimer,TimerHold
             holder.bind(getItem(position))
             //   notifyDataSetChanged()
             Log.d("MyLog","onBindViewHolder")
+            if(getItem(position).isStarted) holder.setIsRecyclable(false)
 
             }
 
-     //   override fun getItemCount(): Int {
-    //       return myTimers.count()
-   //     }
-
-    /*    fun AddTimer(myTimer: MyTimer) {
-            timerList.add(myTimer)
-            notifyDataSetChanged()
-        }*/
-
-
-        companion object {
+     companion object {
         const val START_TIME = "00:00:00"
     //    private const val UNIT_TEN_MS = 10L
     //    private const val PERIOD  = 1000L * 60L * 60L * 24L // Day

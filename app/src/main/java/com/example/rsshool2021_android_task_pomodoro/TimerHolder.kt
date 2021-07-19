@@ -38,11 +38,11 @@ class TimerHolder (
             startTimer(myTimer)
         }else {
                  stopTimer(myTimer)
-
              }
 
         Log.d("MyLog","fun bind")
         initButtonsListeners(myTimer)
+
     }
 
     private fun initButtonsListeners(myTimer: MyTimer) {
@@ -72,23 +72,23 @@ class TimerHolder (
 
     private fun startTimer(myTimer: MyTimer) {
         binding.btControl.text = "PAUSE"
-    //    R.string.Pause
+
 
         timer?.cancel()
         timer = getCountDownTimer(myTimer)
         timer?.start()
 
 
-        binding.indicator.isInvisible = false
+        if(myTimer.currentMs != 0L) binding.indicator.isInvisible = false
         (binding.indicator.background as? AnimationDrawable)?.start()
 
 
 
         binding.circularProgressbarOne.setPeriod(myTimer.allMs)
-        binding.circularProgressbarTwo.setPeriod(myTimer.allMs)
+     //   binding.circularProgressbarTwo.setPeriod(myTimer.allMs)
 
         binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
-        binding.circularProgressbarTwo.setCurrent(myTimer.currentMs)
+     //   binding.circularProgressbarTwo.setCurrent(myTimer.currentMs)
 
 
 
@@ -109,66 +109,57 @@ class TimerHolder (
         binding.indicator.isInvisible = true
         (binding.indicator.background as? AnimationDrawable)?.stop()
 
-      //  binding.circularProgressbarTwo.progress = 100- myTimer.currentMs.toInt()*100/myTimer.allMs.toInt()
-
-       //     myTimer.currentMs.toString().toInt() // Main Progress
-     //   binding.circularProgressbar.secondaryProgress = 100 // Secondary Progress
-     //   binding.circularProgressbar.max = 100 // Maximum Progress
-     //   binding.circularProgressbar.progressDrawable = drawable
-
         binding.circularProgressbarOne.setPeriod(myTimer.allMs)
         binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
 
-        //val animation = ObjectAnimator.ofInt (binding.circularProgressbar, "progress", 0, 100)
-        //animation.setDuration(1000)
-        //animation.setInterpolator(TimeInterpolator 100)
-        //animation.pause()
-
-    }
+        }
 
 
     private fun getCountDownTimer(myTimer: MyTimer): CountDownTimer {
 
        return object : CountDownTimer(myTimer.currentMs.toString().toLong(), 1000) {
-       // val interval = UNIT_TEN_MS
-          //  var timerTime = myTimer.currentMs.toString().toLong()
+
+
+        //   val leftTime = myTimer.currentMs + System.currentTimeMillis()
+
+
             override fun onTick(timerTime: Long) {
+                Log.d("MyLog",myTimer.isStarted.toString())
+            //    myTimer.currentMs = (leftTime - System.currentTimeMillis())
+
+                Log.d("MyLog",binding.btControl.text.toString())
+                Log.d("MyLog","alternative count ${myTimer.currentMs}}")
 
                     myTimer.currentMs = timerTime
 
                     Log.d("MyLog","Tick ${myTimer.currentMs.toString()}")
-                    binding.timeView.text = timerTime.displayTime()
+                binding.timeView.text = myTimer.currentMs.displayTime()
+                //    binding.timeView.text = timerTime.displayTime()
                     binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
-                    binding.circularProgressbarTwo.setCurrent(myTimer.currentMs)
-
-
-
-
-           if(myTimer.currentMs < 2000L ) {
-                //        val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-                //        toneGen1.startTone(ToneGenerator.TONE_CDMA_CALL_SIGNAL_ISDN_NORMAL, 5000)
-                    }
 
             }
 
+
            override fun onFinish() {
                binding.indicator.isInvisible = true
-               myTimer.currentMs = 0L
+
+            Log.d("MyLog","display ${binding.timeView.text}")
+
+                val beeper = MediaPlayer.create(itemView.context, R.raw.beep)
+                beeper.start()
+
+            myTimer.currentMs = 0L
                binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
-               binding.circularProgressbarTwo.setCurrent(myTimer.currentMs)
+            //   binding.circularProgressbarTwo.setCurrent(myTimer.currentMs)
 
                binding.timeView.text = myTimer.currentMs.displayTime()
                Log.d("MyLog","End time ${myTimer.currentMs.toString()}")
 
-               val beeper = MediaPlayer.create(itemView.context, R.raw.beep)
-               beeper.start()
            }
 
        }
 
        }
-
-
 
 
     private fun Long.displayTime(): String {
@@ -185,11 +176,4 @@ class TimerHolder (
         return if (count / 10L > 0) "$count"
         else "0$count"
     }
-
-
-  //  companion object {
-    //    const val START_TIME = "00:00:00:01"
-     //   private const val UNIT_TEN_MS = 10L
-   //     private const val UNIT_TEN_MS = 1000L
-  //  }
 }

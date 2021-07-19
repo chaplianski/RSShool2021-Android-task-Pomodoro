@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.concurrent.timer
 
 val myTimers = mutableListOf<MyTimer>()
 
@@ -35,6 +36,9 @@ class MainActivity : AppCompatActivity(), TimerListeners, LifecycleObserver {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+
 
         binding.rcView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
@@ -75,25 +79,46 @@ class MainActivity : AppCompatActivity(), TimerListeners, LifecycleObserver {
     }
 
     override fun start(id: Int) {
+
+
+        for (i in 0..myTimers.size-1) {
+            if (myTimers[i].id != id)
+                stop(myTimers[i].id, myTimers[i].currentMs)
+            Log.d("MyLog","Значение таймера ${i} c id ${myTimers[i].id.toString()} = ${myTimers[i].isStarted.toString()}")
+        }
+
+
         changeTimer(id, null, true)
 
-        for (i in 0..myTimers.size-1){
-            if (i != id)
-            stop(myTimers[i].id, myTimers[i].currentMs)
-            //isStarted = false
-            Log.d("MyLog","Значение таймера ${i} = ${myTimers[i].isStarted.toString()}")
-           // changeTimer(i, currentMs, false)
-        }
     }
 
     override fun stop(id: Int, currentMs: Long) {
         changeTimer(id, currentMs, false)
         Log.d("MyLog","Stop")
+
     }
 
     override fun delete(id: Int) {
+
+            for (i in myTimers.indices){
+        //      stop(myTimers[i].id, myTimers[id].currentMs)
+                Log.d("MyLog","Значение id таймера ${i} = ${myTimers[i].id.toString()}")
+            }
+
+
         myTimers.remove(myTimers.find { it.id == id })
         timerAdapter.submitList(myTimers.toList())
+
+      //  binding.rcView.removeViewAt(id);
+    //    timerAdapter.notifyItemRemoved(id);
+    //    timerAdapter.notifyDataSetChanged()
+       // timerAdapter.notifyItemRangeChanged(id, myTimers.size);
+
+    //    timerAdapter.notifyDataSetChanged()
+        for (i in myTimers.indices){
+            //      stop(myTimers[i].id, myTimers[id].currentMs)
+            Log.d("MyLog","Значение id таймера ${i} = ${myTimers[i].id.toString()}")
+        }
 
     }
 

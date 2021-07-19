@@ -32,7 +32,7 @@ class ForegroundService : Service() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(getPendingIntent())
             .setSilent(true)
-            .setSmallIcon(R.drawable.ic_skull)
+            .setSmallIcon(R.drawable.ic_doofi_skull)
     }
 
     override fun onCreate() {

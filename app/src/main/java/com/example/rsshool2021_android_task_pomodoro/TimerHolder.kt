@@ -12,6 +12,7 @@ import android.graphics.drawable.AnimationDrawable
 import android.media.*
 import android.os.Build
 import android.os.CountDownTimer
+import android.os.VibrationEffect
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Gravity.FILL
@@ -45,13 +46,18 @@ class TimerHolder (
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun initButtonsListeners(myTimer: MyTimer) {
         binding.btControl.setOnClickListener {
 
                 Log.d("MyLog","Таймер номер ${myTimers.size}")
 
             if (myTimer.isStarted) {
+                myTimer.isStarted = false
+                stopTimer(myTimer)
+
                 listeners.stop(myTimer.id, myTimer.currentMs)
+
                 Log.d("MyLog","Pause")
             } else {
 
@@ -67,14 +73,15 @@ class TimerHolder (
             listeners.delete(myTimer.id)
         }
     }
-    lateinit var animation: ObjectAnimator
+
+   // var timerStop by Delegates.notNull<Boolean>()
 
 
     private fun startTimer(myTimer: MyTimer) {
         binding.btControl.text = "PAUSE"
 
 
-        timer?.cancel()
+      //  timer?.cancel()
         timer = getCountDownTimer(myTimer)
         timer?.start()
 
@@ -98,13 +105,16 @@ class TimerHolder (
 
     }
 
-
+   // var timerStop = true
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun stopTimer(myTimer: MyTimer) {
 
         binding.btControl.text = "START"
-        timer?.cancel()
 
+        timer?.cancel()
+     //   timer?.cancel()
+        Log.d("MyLog", "Сработал Стоп")
+       Log.d("MyLog","Показатель после стопа ")
 
         binding.indicator.isInvisible = true
         (binding.indicator.background as? AnimationDrawable)?.stop()
@@ -124,7 +134,7 @@ class TimerHolder (
 
 
             override fun onTick(timerTime: Long) {
-                Log.d("MyLog",myTimer.isStarted.toString())
+                Log.d("MyLog",binding.btControl.text.toString())
             //    myTimer.currentMs = (leftTime - System.currentTimeMillis())
 
                 Log.d("MyLog",binding.btControl.text.toString())
@@ -145,8 +155,9 @@ class TimerHolder (
 
             Log.d("MyLog","display ${binding.timeView.text}")
 
-                val beeper = MediaPlayer.create(itemView.context, R.raw.beep)
+               val beeper = MediaPlayer.create(itemView.context, R.raw.beep)
                 beeper.start()
+
 
             myTimer.currentMs = 0L
                binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
@@ -154,6 +165,10 @@ class TimerHolder (
 
                binding.timeView.text = myTimer.currentMs.displayTime()
                Log.d("MyLog","End time ${myTimer.currentMs.toString()}")
+            myTimer.currentMs = myTimer.allMs
+               binding.timeView.text = myTimer.currentMs.displayTime()
+               binding.btControl.text = "RESUME"
+
 
            }
 

@@ -33,23 +33,18 @@ class CustomView @JvmOverloads constructor(
                 0
             )
             color = styledAttrs.getColor(R.styleable.CustomView_custom_color, Color.RED)
-          //  style = styledAttrs.getInt(R.styleable.CustomView_custom_style, Gravity.FILL)
             styledAttrs.recycle()
         }
 
         paint.color = color
         paint.style = Paint.Style.FILL
-
-            //if (style == Gravity.FILL) Paint.Style.FILL else Paint.Style.STROKE
         paint.strokeWidth = 5F
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-     //   Log.d("MyLog","onDraw")
         if (periodMs == 0L ) return
-      //      || currentMs == 0L) return
         if (periodMs ==  currentMs) return
 
         val startAngel = ((1-((currentMs % periodMs).toFloat() / periodMs)) * 360)
@@ -66,23 +61,13 @@ class CustomView @JvmOverloads constructor(
         )
 
     }
-    /**
-     * Set lasted milliseconds
-     */
+
     fun setCurrent(current: Long) {
         currentMs = current
         invalidate()
     }
 
-    /**
-     * Set time period
-     */
     fun setPeriod(period: Long) {
         periodMs = period
-    }
-
-    private companion object {
-
-        private const val FILL = 0
     }
 }

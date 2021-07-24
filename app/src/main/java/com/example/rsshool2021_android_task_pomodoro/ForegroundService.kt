@@ -9,6 +9,7 @@ import android.content.Intent
 import android.net.wifi.WpsInfo.INVALID
 import android.os.Build
 import android.os.IBinder
+import android.os.SystemClock.elapsedRealtime
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.*
@@ -19,7 +20,7 @@ class ForegroundService : Service() {
     private var notificationManager: NotificationManager? = null
     private var job: Job? = null
 
-    val beginTime = System.currentTimeMillis()
+    val beginTime = elapsedRealtime()
 
     private val builder by lazy {
         Log.d("MyLog","builder by lazy")
@@ -51,13 +52,13 @@ class ForegroundService : Service() {
     }
 
     private fun processCommand(intent: Intent?) {
-        when (intent?.extras?.getString(COMMAND_ID) ?: INVALID) {
+        when (intent?.extras?.getString(COMMAND_ID) ) {
             COMMAND_START -> {
                 val startTime = intent?.extras?.getLong(STARTED_TIMER_TIME_MS) //?: return
                 startTime?.let { commandStart(it) }
             }
             COMMAND_STOP -> commandStop()
-            INVALID -> return
+         //   INVALID -> return
         }
     }
 
@@ -83,7 +84,8 @@ class ForegroundService : Service() {
                 notificationManager?.notify(
                     NOTIFICATION_ID,
                     getNotification(
-                        (startTime - (System.currentTimeMillis() - beginTime)).displayTime().dropLast(3)
+                        (startTime - (elapsedRealtime() - beginTime)).displayTime().dropLast(3)
+
                     )
                 )
                 delay(INTERVAL)
@@ -138,7 +140,8 @@ class ForegroundService : Service() {
 
     private fun getPendingIntent(): PendingIntent? {
         val resultIntent = Intent(this, MainActivity::class.java)
-        resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+      //  resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        resultIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         return PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_ONE_SHOT)
     }
 

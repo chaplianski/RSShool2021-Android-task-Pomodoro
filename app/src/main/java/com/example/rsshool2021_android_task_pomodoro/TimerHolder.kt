@@ -40,44 +40,24 @@ class TimerHolder (
         }else {
                  stopTimer(myTimer)
              }
-
-        Log.d("MyLog","fun bind")
         initButtonsListeners(myTimer)
-
-
     }
-
-
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun initButtonsListeners(myTimer: MyTimer) {
         binding.btControl.setOnClickListener {
-
-
-        //        Log.d("MyLog","Таймер номер ${myTimers.size}")
-
             if (myTimer.isStarted) {
                 myTimer.isStarted = false
                 stopTimer(myTimer)
-
                 listeners.stop(myTimer.id, myTimer.currentMs)
-
-                Log.d("MyLog","Pause")
             } else {
-
-                Log.d("MyLog","Timer Id = ${myTimer.id}")
                 listeners.start(myTimer.id)
-
-                Log.d("MyLog","Start")
             }
-
         }
-
         binding.deleteBt.setOnClickListener {
             listeners.delete(myTimer.id)
         }
     }
-
 
     private fun startTimer(myTimer: MyTimer) {
         binding.btControl.text = "PAUSE"
@@ -85,17 +65,10 @@ class TimerHolder (
         myTimer.count?.cancel()
         myTimer.count = getCountDownTimer(myTimer)
         myTimer.count?.start()
-
-     //   timer?.cancel()
-     //   timer = getCountDownTimer(myTimer)
-    //    timer?.start()
-
         if(myTimer.currentMs != 0L) binding.indicator.isInvisible = false
         (binding.indicator.background as? AnimationDrawable)?.start()
         binding.circularProgressbarOne.setPeriod(myTimer.allMs)
         binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
-
-        Log.d("MyLog", "осталось ${myTimer.currentMs}")
     }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -104,16 +77,11 @@ class TimerHolder (
         binding.btControl.text = "START"
 
         myTimer.count?.cancel()
-     //   timer?.cancel()
-    //    Log.d("MyLog", "Сработал Стоп")
-    //    Log.d("MyLog","Показатель после стопа ")
-
         binding.indicator.isInvisible = true
         (binding.indicator.background as? AnimationDrawable)?.stop()
         binding.circularProgressbarOne.setPeriod(myTimer.allMs)
         binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
         }
-
 
     private fun getCountDownTimer(myTimer: MyTimer): CountDownTimer {
 
@@ -121,42 +89,27 @@ class TimerHolder (
 
            var checkSignalBeep = myTimer.currentMs
 
-
             override fun onTick(timerTime: Long) {
-           //     Log.d("MyLog",binding.btControl.text.toString())
-                Log.d("MyLog"," count ${myTimer.currentMs}}")
-
-                myTimer.currentMs = timerTime
+                 myTimer.currentMs = timerTime
                 binding.timeView.text = myTimer.currentMs.displayTime()
                 binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
-
                 checkSignalBeep = checkSignalBeep - 1000
-
-
-                    Log.d("MyLog", "End time ${myTimer.count.toString()}")
-
             }
 
            override fun onFinish() {
                binding.indicator.isInvisible = true
-               Log.d("MyLog", "display ${binding.timeView.text}")
-               if (checkSignalBeep < 1000L ) {
+               if (checkSignalBeep < 1500L ) {
                    val beeper = MediaPlayer.create(itemView.context, R.raw.beep)
                    beeper.start()
                    myTimer.currentMs = 0L
                    binding.circularProgressbarOne.setCurrent(myTimer.currentMs)
               }
-
-
                binding.timeView.text = myTimer.currentMs.displayTime()
                myTimer.isStarted = false
                binding.btControl.text = "START"
            }
-
        }
-
     }
-
 
     private fun Long.displayTime(): String {
         if (this <= 0L) {

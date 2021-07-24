@@ -60,7 +60,7 @@ class TimerHolder (
     }
 
     private fun startTimer(myTimer: MyTimer) {
-        binding.btControl.text = "PAUSE"
+        binding.btControl.text = "STOP"
 
         myTimer.count?.cancel()
         myTimer.count = getCountDownTimer(myTimer)

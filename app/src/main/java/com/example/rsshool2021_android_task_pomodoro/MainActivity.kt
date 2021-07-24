@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity(), TimerListeners, LifecycleObserver {
                 val startIntent = Intent(this, ForegroundService::class.java)
                 startIntent.putExtra(COMMAND_ID, COMMAND_START)
                 startTime = myTimers[i].currentMs
+                Log.d("MyLog", "Start Time in activity $startTime")
                 startIntent.putExtra(STARTED_TIMER_TIME_MS, startTime)
                 startService(startIntent)
             }

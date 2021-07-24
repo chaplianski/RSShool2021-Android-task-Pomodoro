@@ -19,8 +19,7 @@ class ForegroundService : Service() {
     private var isServiceStarted = false
     private var notificationManager: NotificationManager? = null
     private var job: Job? = null
-
-    val beginTime = elapsedRealtime()
+    var beginTime = 0L
 
     private val builder by lazy {
         Log.d("MyLog","builder by lazy")
@@ -52,10 +51,14 @@ class ForegroundService : Service() {
     }
 
     private fun processCommand(intent: Intent?) {
+
         when (intent?.extras?.getString(COMMAND_ID) ) {
             COMMAND_START -> {
                 val startTime = intent?.extras?.getLong(STARTED_TIMER_TIME_MS) //?: return
+                beginTime = elapsedRealtime() + startTime!!
+                Log.d("MyLog", "Start Time from activity $startTime")
                 startTime?.let { commandStart(it) }
+
             }
             COMMAND_STOP -> commandStop()
          //   INVALID -> return
@@ -84,14 +87,15 @@ class ForegroundService : Service() {
                 notificationManager?.notify(
                     NOTIFICATION_ID,
                     getNotification(
-                        (startTime - (elapsedRealtime() - beginTime)).displayTime().dropLast(3)
-
+                        (beginTime - elapsedRealtime()).displayTime().dropLast(3)
                     )
                 )
                 delay(INTERVAL)
             }
          }
     }
+
+
 
     private fun commandStop() {
         if (!isServiceStarted) {

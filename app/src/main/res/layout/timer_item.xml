@@ -42,7 +42,8 @@
                 app:layout_constraintStart_toStartOf="@id/time_view"
                 app:layout_constraintTop_toTopOf="@+id/time_view"
                 app:layout_constraintVertical_bias="0.459"
-                app:srcCompat="@drawable/blink" />
+                app:srcCompat="@drawable/blink"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/time_view"
@@ -57,21 +58,6 @@
                 android:textSize="34sp"
                 app:layout_constraintEnd_toStartOf="@+id/circularProgressbarOne"
                 tools:layout_editor_absoluteY="3dp" />
-
-            <com.example.rsshool2021_android_task_pomodoro.CustomView
-                android:id="@+id/circularProgressbarTwo"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
-                android:color="@color/dark_red"
-                app:custom_style="fill"
-                app:layout_constraintBottom_toBottomOf="@+id/bt_control"
-
-                app:layout_constraintEnd_toStartOf="@+id/bt_control"
-                app:layout_constraintTop_toTopOf="@+id/bt_control"
-                tools:ignore="MissingClass,MissingPrefix" />
 
             <com.example.rsshool2021_android_task_pomodoro.CustomView
                 android:id="@+id/circularProgressbarOne"

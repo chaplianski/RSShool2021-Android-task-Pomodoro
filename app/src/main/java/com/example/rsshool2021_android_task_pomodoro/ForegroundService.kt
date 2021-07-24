@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.*
 
 class ForegroundService : Service() {
@@ -54,8 +53,8 @@ class ForegroundService : Service() {
     private fun processCommand(intent: Intent?) {
         when (intent?.extras?.getString(COMMAND_ID) ?: INVALID) {
             COMMAND_START -> {
-                val startTime = intent?.extras?.getLong(STARTED_TIMER_TIME_MS) ?: return
-                commandStart(startTime)
+                val startTime = intent?.extras?.getLong(STARTED_TIMER_TIME_MS) //?: return
+                startTime?.let { commandStart(it) }
             }
             COMMAND_STOP -> commandStop()
             INVALID -> return
@@ -66,11 +65,12 @@ class ForegroundService : Service() {
         if (isServiceStarted) {
             return
         }
-        Log.i("MyLog", "commandStart()")
+        Log.d("MyLog", "commandStart()")
         try {
             moveToStartedState()
             startForegroundAndShowNotification()
             continueTimer(startTime)
+            if (startTime == 0L) commandStop()
 
         } finally {
             isServiceStarted = true
@@ -83,25 +83,19 @@ class ForegroundService : Service() {
                 notificationManager?.notify(
                     NOTIFICATION_ID,
                     getNotification(
-
-
                         (startTime - (System.currentTimeMillis() - beginTime)).displayTime().dropLast(3)
-
-
-                       // (System.currentTimeMillis() - startTime).displayTime().dropLast(3)
                     )
                 )
                 delay(INTERVAL)
             }
-
-        }
+         }
     }
 
     private fun commandStop() {
         if (!isServiceStarted) {
             return
         }
-        Log.i("MyLog", "commandStop()")
+        Log.d("MyLog", "commandStop()")
         try {
             job?.cancel()
             stopForeground(true)
@@ -125,6 +119,7 @@ class ForegroundService : Service() {
         createChannel()
         val notification = getNotification("content")
         startForeground(NOTIFICATION_ID, notification)
+
     }
 
     private fun getNotification(content: String) = builder.setContentText(content).build()

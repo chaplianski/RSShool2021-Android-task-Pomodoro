@@ -1,24 +1,16 @@
 package com.example.rsshool2021_android_task_pomodoro
 
-import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
-import android.media.MediaPlayer
-import android.media.RingtoneManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.rsshool2021_android_task_pomodoro.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.concurrent.timer
 
-val myTimers = mutableListOf<MyTimer>()
+//val myTimers = mutableListOf<MyTimer>()
+//private var timer: CountDownTimer? = null
 
 class MainActivity : AppCompatActivity(), TimerListeners, LifecycleObserver {
     val timerAdapter = TimerAdapter(this)
@@ -36,8 +28,8 @@ class MainActivity : AppCompatActivity(), TimerListeners, LifecycleObserver {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_doofi_skull_icon)
 
 
         binding.rcView.apply {
@@ -52,7 +44,8 @@ class MainActivity : AppCompatActivity(), TimerListeners, LifecycleObserver {
                                 nextId++,
                                 binding.enterMinute.text.toString().toLong() * 1000 * 60,
                                 false,
-                                binding.enterMinute.text.toString().toLong() * 1000 * 60
+                                binding.enterMinute.text.toString().toLong() * 1000 * 60,
+                                null
 
                             )
 
@@ -62,63 +55,38 @@ class MainActivity : AppCompatActivity(), TimerListeners, LifecycleObserver {
                     }
                 }
 
-            startTime = System.currentTimeMillis()
+         //   startTime = System.currentTimeMillis()
 
-           // lifecycleScope.launch(Dispatchers.Main) {
-            //    while (true) {
-
-                    // был timerview  поставил addTimer
-                //    binding.addTimer.text = (System.currentTimeMillis() - startTime).displayTime()
-            //        delay(INTERVAL)
-            //    }
-           // }
-
-
-
-
-    }
+        }
 
     override fun start(id: Int) {
 
-
         for (i in 0..myTimers.size-1) {
-            if (myTimers[i].id != id)
+            if (myTimers[i].id != id && myTimers[i].isStarted){
                 stop(myTimers[i].id, myTimers[i].currentMs)
-            Log.d("MyLog","Значение таймера ${i} c id ${myTimers[i].id.toString()} = ${myTimers[i].isStarted.toString()}")
+                myTimers[i].count?.cancel()
+                myTimers[i].count?.onFinish()
+                Log.d("MyLog","Отключен таймер ${i} c id ${myTimers[i].id}")
+            }
+          //  Log.d("MyLog","Значение таймера ${i} c id ${myTimers[i].id} = ${myTimers[i].isStarted}")
         }
-
+     //   timerAdapter.notifyDataSetChanged()
 
         changeTimer(id, null, true)
-
+        Log.d("MyLog","Значение id $id ")
     }
 
     override fun stop(id: Int, currentMs: Long) {
+
         changeTimer(id, currentMs, false)
         Log.d("MyLog","Stop")
-
+        timerAdapter.notifyDataSetChanged()
     }
 
     override fun delete(id: Int) {
 
-            for (i in myTimers.indices){
-        //      stop(myTimers[i].id, myTimers[id].currentMs)
-                Log.d("MyLog","Значение id таймера ${i} = ${myTimers[i].id.toString()}")
-            }
-
-
         myTimers.remove(myTimers.find { it.id == id })
         timerAdapter.submitList(myTimers.toList())
-
-      //  binding.rcView.removeViewAt(id);
-    //    timerAdapter.notifyItemRemoved(id);
-    //    timerAdapter.notifyDataSetChanged()
-       // timerAdapter.notifyItemRangeChanged(id, myTimers.size);
-
-    //    timerAdapter.notifyDataSetChanged()
-        for (i in myTimers.indices){
-            //      stop(myTimers[i].id, myTimers[id].currentMs)
-            Log.d("MyLog","Значение id таймера ${i} = ${myTimers[i].id.toString()}")
-        }
 
     }
 
@@ -127,7 +95,7 @@ class MainActivity : AppCompatActivity(), TimerListeners, LifecycleObserver {
         val newTimers = mutableListOf<MyTimer>()
         myTimers.forEach {
             if (it.id == id) {
-                newTimers.add(MyTimer(it.id, currentMs ?: it.currentMs, isStarted,it.allMs))
+                newTimers.add(MyTimer(it.id, currentMs ?: it.currentMs, isStarted,it.allMs,it.count))
             } else {
                 newTimers.add(it)
             }
@@ -155,6 +123,7 @@ class MainActivity : AppCompatActivity(), TimerListeners, LifecycleObserver {
                 Log.d("MyLog","Таймер показывает ${startTime.displayTime()}")
                 //     startTime)
                 startService(startIntent)
+                Log.d("MyLog","Lifecycle.onAppBackgrounded.End")
             }
         }
     }
@@ -165,6 +134,7 @@ class MainActivity : AppCompatActivity(), TimerListeners, LifecycleObserver {
         val stopIntent = Intent(this, ForegroundService::class.java)
         stopIntent.putExtra(COMMAND_ID, COMMAND_STOP)
         startService(stopIntent)
+        Log.d("MyLog","Lifecycle.onAppForegrounded.End")
     }
 
     private companion object {

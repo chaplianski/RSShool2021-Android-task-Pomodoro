@@ -47,7 +47,7 @@ class CustomView @JvmOverloads constructor(
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        Log.d("MyLog","onDraw")
+     //   Log.d("MyLog","onDraw")
         if (periodMs == 0L ) return
       //      || currentMs == 0L) return
         if (periodMs ==  currentMs) return

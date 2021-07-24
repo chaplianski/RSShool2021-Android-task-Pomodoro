@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Помидоры</string>
-    <string name="add_timer">Добавить таймер</string>
+    <string name="app_name">Pomodoro</string>
+    <string name="add_timer">Add timer</string>
 
 </resources>
